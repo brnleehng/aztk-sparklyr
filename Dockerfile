@@ -1,4 +1,4 @@
-FROM jiata/aztk0.1.0-spark1.6.3-python2.7.13
+FROM jiata/aztk:0.1.0-spark2.2.0-python3.5.4
 
 ## Install external dependencies for R and packages
 
