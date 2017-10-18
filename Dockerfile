@@ -10,6 +10,7 @@ RUN apt-get update \
     libxml2-dev \
     libapparmor1 \
     gdebi-core \
+    gfortran \
   && . /etc/environment \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/ \
