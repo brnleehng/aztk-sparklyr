@@ -31,21 +31,10 @@ RUN apt-get update -qq \
 
 ## Install Packages
 RUN Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr'), repo = 'http://cran.us.r-project.org')"
-  # && ln -s /usr/local/lib/R/site-library/littler/examples/install2.r /usr/local/bin/install2.r \
-  # && ln -s /usr/local/lib/R/site-library/littler/examples/installGithub.r /usr/local/bin/installGithub.r \
-  # && ln -s /usr/local/lib/R/site-library/littler/bin/r /usr/local/bin/r \
-  # ## TEMPORARY WORKAROUND to get more robust error handling for install2.r prior to littler update
-  # && curl -O /usr/local/bin/install2.r https://github.com/eddelbuettel/littler/raw/master/inst/examples/install2.r \
-  # && chmod +x /usr/local/bin/install2.r \
-  # ## Clean up from R source install
-  # && cd / \
-  # && rm -rf /tmp/* \
-  # && apt-get remove --purge -y $BUILDDEPS \
-  # && apt-get autoremove -y \
-  # && apt-get autoclean -y \
-  # && install2.r -e -r tidyverse sparklyr
 
 ## Install rstudio-server
 RUN wget https://download2.rstudio.org/rstudio-server-1.1.383-amd64.deb
 RUN gdebi rstudio-server-1.1.383-amd64.deb --non-interactive
 RUN echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf
+
+EXPOSE 8787
