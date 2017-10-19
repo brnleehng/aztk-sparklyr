@@ -31,7 +31,7 @@ RUN apt-get update -qq \
     && rm *.deb
 
 ## Install Packages
-RUN Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr'), repo = 'http://cran.us.r-project.org')"
+RUN mlserver-Rscript-bin -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr'), repo = 'http://cran.us.r-project.org')"
 
 ## Install rstudio-server
 RUN wget https://download2.rstudio.org/rstudio-server-1.1.383-amd64.deb
@@ -51,7 +51,7 @@ RUN echo "rsession-which-r=/opt/microsoft/rclient/3.4.1/bin/R/R" >> /etc/rstudio
 RUN echo "r-libs-user=/opt/microsoft/rclient/3.4.1/libraries/RServer" >> /etc/rstudio/rsession.conf
 
 # start rstudio-server session
+EXPOSE 8787
 
 CMD ["/usr/lib/rstudio-server/bin/rserver", "--server-daemonize=0", "--server-app-armor-enabled=0"]
 
-EXPOSE 8787
