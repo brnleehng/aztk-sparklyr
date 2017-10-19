@@ -44,5 +44,14 @@ RUN set -e \
       && echo rstudio:rstudio \
         | chpasswd
 
+# Set R to R Client
+
+# set rclient to rsession for rstudio-server
+RUN echo "rsession-which-r=/opt/microsoft/rclient/3.4.1/bin/R/R" >> /etc/rstudio/rserver.conf
+RUN echo "r-libs-user=/opt/microsoft/rclient/3.4.1/libraries/RServer" >> /etc/rstudio/rsession.conf
+
+# start rstudio-server session
+
+CMD ["/usr/lib/rstudio-server/bin/rserver", "--server-daemonize=0", "--server-app-armor-enabled=0"]
 
 EXPOSE 8787
