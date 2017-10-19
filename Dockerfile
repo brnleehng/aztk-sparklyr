@@ -38,4 +38,11 @@ RUN wget https://download2.rstudio.org/rstudio-server-1.1.383-amd64.deb
 RUN gdebi rstudio-server-1.1.383-amd64.deb --non-interactive
 RUN echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf
 
+# Create user
+RUN set -e \
+      && useradd -m -d /home/rstudio rstudio \
+      && echo rstudio:rstudio \
+        | chpasswd
+
+
 EXPOSE 8787
