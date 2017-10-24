@@ -1,4 +1,4 @@
-FROM jiata/aztk:0.1.0-spark2.2.0-python3.5.4
+FROM jiata/aztk-base:0.1.0-spark2.2.0
 
 ## Install external dependencies for R and packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -17,7 +17,6 @@ RUN apt-get update \
   && rm -rf /tmp/downloaded_packages/ /tmp/*.rds
 
 ## Install R Client
-
 RUN apt-get update -qq \
     && apt-get dist-upgrade -y \
     && apt-get install -y wget make gcc \
@@ -37,5 +36,10 @@ RUN Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr')
 RUN wget https://download2.rstudio.org/rstudio-server-1.1.383-amd64.deb
 RUN gdebi rstudio-server-1.1.383-amd64.deb --non-interactive
 RUN echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf
+
+## Create user for rstudio-server
+RUN set -e \
+  && useradd -m -d /home/rstudio rstudio \
+  && echo rstudio:rstudio | chpasswd
 
 EXPOSE 8787
