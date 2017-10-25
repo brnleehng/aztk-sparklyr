@@ -2,6 +2,7 @@ FROM jiata/aztk-vanilla:0.1.0-spark2.2.0
 
 ## Install external dependencies for R and packages
 ENV DEBIAN_FRONTEND noninteractive
+ENV AZTK_PYTHON_VERSION=3.5.4
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends  \
@@ -42,4 +43,5 @@ RUN set -e \
   && useradd -m -d /home/rstudio rstudio \
   && echo rstudio:rstudio | chpasswd
 
+ENV USER_PYTHON_VERSION $AZTK_PYTHON_VERSION
 EXPOSE 8787
