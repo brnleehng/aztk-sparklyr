@@ -1,4 +1,4 @@
-FROM jiata/aztk-base:0.1.0-spark2.2.0
+FROM jiata/aztk-vanilla:0.1.0-spark2.2.0
 
 ## Install external dependencies for R and packages
 ENV DEBIAN_FRONTEND noninteractive
