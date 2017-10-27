@@ -11,6 +11,8 @@ RUN apt-get update \
     libapparmor1 \
     gdebi-core \
     gfortran \
+    lsb-release \
+    psmisc \
   && . /etc/environment \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/ \
