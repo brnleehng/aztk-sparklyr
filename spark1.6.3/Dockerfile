@@ -27,6 +27,7 @@ RUN Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr')
   && wget https://download2.rstudio.org/rstudio-server-1.1.383-amd64.deb \
   && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
   && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf
+  && echo "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> /etc/R/Rprofile.site \
 
 ## Create user for rstudio-server
 RUN set -e \
