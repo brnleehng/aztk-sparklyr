@@ -3,21 +3,17 @@ This Dockerfile is used to build the __aztk-r__ Docker image used by this toolki
 
 You can modify these Dockerfiles to build your own image. However, in mose cases, building on top of the __aztk-vanilla__ image is recommended.
 
-NOTE: If you plan to use Jupyter Notebooks with your Spark cluster, we recommend using this image as Jupyter Notebook comes pre-installed with Anaconda. 
-
 ## How to build this image
-This Dockerfile takes in a variable at build time that allow you to specify your desired R versions: **R_VERSION** 
+This Dockerfile takes in a variable at build time that allow you to specify your desired Rstudio server versions: **RSTUDIO_SERVER_VERSION** 
 
-By default, we set **R_VERSION=anaconda3-5.0.0**.
+By default, we set **RSTUDIO_SERVER_VERSION=1.1.383**.
 
-For example, if I wanted to use Anaconda3 v5.0.0 with Spark v2.1.0, I would select the appropriate Dockerfile and build the image as follows:
+For example, if I wanted to use Rstudio Server v1.1.383 with Spark v2.1.0, I would select the appropriate Dockerfile and build the image as follows:
 ```sh
 # spark2.1.0/Dockerfile
 docker build \
-    --build-arg R_VERSION=anaconda3-5.0.0 \
+    --build-arg RSTUDIO_SERVER_VERSION=1.1.383 \
     -t <my_image_tag> .
 ```
 
-**R_VERSION** is used to set the version of Anaconda for your cluster. 
-
-NOTE: Most versions of Python will work. However, when selecting your Python version, please make sure that the it is compatible with your selected version of Spark. 
+**RSTUDIO_SERVER_VERSION** is used to set the version of rstudio server for your cluster. 

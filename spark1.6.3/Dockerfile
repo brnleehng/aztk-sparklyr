@@ -1,5 +1,7 @@
 FROM jiata/aztk-vanilla:0.1.0-spark1.6.3
 
+ARG RSTUDIO_SERVER_VERSION=1.1.383
+
 ## Install external dependencies for R and packages
 ENV DEBIAN_FRONTEND noninteractive
 
