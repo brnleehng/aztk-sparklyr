@@ -75,9 +75,8 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
   && cd tmp/ \
   ## Download source code
-  && IFS='.' read -r -a array << ${R_VERSION} \
-  && baseVersion="${array[0]}" \
-  && curl -O https://cran.r-project.org/src/base/R-$baseVersion/R-${R_VERSION}.tar.gz \
+  && IFS='.' read -r -a baseVersion << ${R_VERSION} \
+  && curl -O https://cran.r-project.org/src/base/R-${baseVersion[0]}/R-${R_VERSION}.tar.gz \
   ## Extract source code
   && tar -xf R-${R_VERSION}.tar.gz \
   && cd R-${R_VERSION} \
@@ -133,9 +132,9 @@ RUN apt-get update \
   && apt-get remove --purge -y $BUILDDEPS \
   && apt-get autoremove -y \
   && apt-get autoclean -y \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
   ## Downloading and Installing RStudio Server
-  Rscript -e "install.packages(c('tidyverse', 'sparklyr'))" \
+  && Rscript -e "install.packages(c('tidyverse', 'sparklyr'))" \
   && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
   && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
   && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \
