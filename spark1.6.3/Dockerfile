@@ -133,8 +133,9 @@ RUN apt-get update \
   && apt-get autoremove -y \
   && apt-get autoclean -y \
   && rm -rf /var/lib/apt/lists/* \
-  ## Downloading and Installing RStudio Server
-  && Rscript -e "install.packages(c('tidyverse', 'sparklyr'))" \
+
+## Downloading and Installing RStudio Server
+RUN Rscript -e "install.packages(c('tidyverse', 'sparklyr'))" \
   && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
   && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
   && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \
