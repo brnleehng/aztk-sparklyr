@@ -78,8 +78,6 @@ RUN apt-get update \
   && IFS='.' read -r -a array << ${R_VERSION} \
   && baseVersion="${array[0]}" \
   && curl -O https://cran.r-project.org/src/base/R-$baseVersion/R-${R_VERSION}.tar.gz \
-  ##&& curl -O https://cran.r-project.org/src/base/R-3/R-${R_VERSION}.tar.gz \
-  && /bootstrap.sh \
   ## Extract source code
   && tar -xf R-${R_VERSION}.tar.gz \
   && cd R-${R_VERSION} \
