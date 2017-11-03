@@ -9,6 +9,8 @@ ENV R_VERSION=${R_VERSION:-3.4.2} \
     LANG=en_US.UTF-8 \
     TERM=xterm
 
+ADD bootstrap.sh /bootstrap.sh
+
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     bash-completion \
@@ -75,8 +77,7 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
   && cd tmp/ \
   ## Download source code
-  && IFS='.' read -r -a baseVersion << ${R_VERSION} \
-  && curl -O https://cran.r-project.org/src/base/R-${baseVersion[0]}/R-${R_VERSION}.tar.gz \
+  && /bootstrap.sh ${R_VERSION} \
   ## Extract source code
   && tar -xf R-${R_VERSION}.tar.gz \
   && cd R-${R_VERSION} \
