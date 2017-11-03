@@ -75,7 +75,11 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
   && cd tmp/ \
   ## Download source code
-  && curl -O https://cran.r-project.org/src/base/R-3/R-${R_VERSION}.tar.gz \
+  && IFS='.' read -r -a array << ${R_VERSION} \
+  && baseVersion="${array[0]}" \
+  && curl -O https://cran.r-project.org/src/base/R-$baseVersion/R-${R_VERSION}.tar.gz \
+  ##&& curl -O https://cran.r-project.org/src/base/R-3/R-${R_VERSION}.tar.gz \
+  && /bootstrap.sh \
   ## Extract source code
   && tar -xf R-${R_VERSION}.tar.gz \
   && cd R-${R_VERSION} \
@@ -132,16 +136,14 @@ RUN apt-get update \
   && apt-get autoremove -y \
   && apt-get autoclean -y \
   && rm -rf /var/lib/apt/lists/*
-
-RUN Rscript -e "install.packages(c('tidyverse', 'sparklyr'), repo = 'http://cran.us.r-project.org')" \
+  ## Downloading and Installing RStudio Server
+  Rscript -e "install.packages(c('tidyverse', 'sparklyr'))" \
   && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
   && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
   && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \
-  #&& Rscript -e "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')"
-  && echo "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> ${R_HOME}/etc/Rprofile.site
-
-## Create user for rstudio-server
-RUN set -e \
+  && echo "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> ${R_HOME}/etc/Rprofile.site \
+  ## Preparing default user for Rstudio Server
+  && set -e \
   && useradd -m -d /home/rstudio rstudio \
   && echo rstudio:rstudio | chpasswd
 
