@@ -133,18 +133,17 @@ RUN apt-get update \
   && apt-get autoclean -y \
   && rm -rf /var/lib/apt/lists/*
 
-CMD ["R"]
-
-RUN Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr'), repo = 'http://cran.us.r-project.org')" \
+RUN Rscript -e "install.packages(c('tidyverse', 'sparklyr'), repo = 'http://cran.us.r-project.org')" \
   && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
   && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
   && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \
-  && Rscript -e "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')"
-#  && echo "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> /etc/R/Rprofile.site
+  #&& Rscript -e "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')"
+  && echo "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> ${R_HOME}/etc/Rprofile.site
 
 ## Create user for rstudio-server
 RUN set -e \
   && useradd -m -d /home/rstudio rstudio \
   && echo rstudio:rstudio | chpasswd
 
+CMD ["R"]
 EXPOSE 8787
