@@ -31,6 +31,16 @@ RUN apt-get update \
     unzip \
     zip \
     zlib1g \
+    libcurl4-openssl-dev \
+    libxml2-dev \
+    libapparmor1 \
+    gdebi-core \
+    lsb-release \
+    psmisc \
+    git \
+    libssl-dev \
+    sudo \
+    wget \
   && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
   && locale-gen en_US.utf8 \
   && /usr/sbin/update-locale LANG=en_US.UTF-8 \
@@ -153,4 +163,5 @@ RUN Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr')
 RUN set -e \
   && useradd -m -d /home/rstudio rstudio \
   && echo rstudio:rstudio | chpasswd
+
 EXPOSE 8787
