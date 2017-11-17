@@ -3,6 +3,7 @@ FROM jiata/aztk-base:0.1.0-spark1.6.3
 ARG R_VERSION=3.4.1
 ARG RSTUDIO_SERVER_VERSION=1.1.383
 ARG BUILD_DATE
+
 ENV DEBIAN_FRONTEND noninteractive
 ENV BUILD_DATE ${BUILD_DATE:-}
 ENV R_VERSION=${R_VERSION:-3.4.2} \
@@ -10,7 +11,7 @@ ENV R_VERSION=${R_VERSION:-3.4.2} \
     LANG=en_US.UTF-8 \
     TERM=xterm
 
-ADD bootstrap.sh /bootstrap.sh
+ADD bootstrap.sh /
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -78,8 +79,8 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
   && cd tmp/ \
   ## Download source code
-  && chmod +x bootstrap.sh \
-  && /bootstrap.sh ${R_VERSION} \
+  && chmod +x /bootstrap.sh \
+  && /bootstrap.sh \
   ## Extract source code
   && tar -xf R-${R_VERSION}.tar.gz \
   && cd R-${R_VERSION} \
@@ -142,7 +143,7 @@ RUN Rscript -e "install.packages(c('tidyverse', 'sparklyr'))" \
   && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
   && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
   && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \
-  ## && echo "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> ${R_HOME}/etc/Rprofile.site \
+  ##&& echo "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> ${R_HOME}/etc/Rprofile.site \
   ## Preparing default user for Rstudio Server
   && set -e \
   && useradd -m -d /home/rstudio rstudio \
