@@ -6,10 +6,8 @@ ARG BUILD_DATE
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV BUILD_DATE ${BUILD_DATE:-}
-ENV R_VERSION=${R_VERSION:-3.4.2} \
-    LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    TERM=xterm
+
+RUN /bin/bash -c "R_MAJOR_VERSION=${R_VERSION:0:1} && echo $R_MAJOR_VERSION && curl -O https://cran.r-project.org/src/base/R-${R_MAJOR_VERSION}/R-${R_VERSION}.tar.gz"
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -77,7 +75,9 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
   ## Download source code
   && cd tmp/ \
-  && /bin/bash -c "IFS='.' read majorVersion minorVersion patchVersion <<< ${R_VERSION}; curl -O https://cran.r-project.org/src/base/R-${majorVersion}/R-${R_VERSION}.tar.gz" \
+  && R_MAJOR_VERSION=${R_VERSION:0:1} \
+  && echo $R_MAJOR_VERSION \
+  && curl -O https://cran.r-project.org/src/base/R-${R_MAJOR_VERSION}/R-${R_VERSION}.tar.gz \
   ## Extract source code
   && tar -xf R-${R_VERSION}.tar.gz \
   && cd R-${R_VERSION} \
