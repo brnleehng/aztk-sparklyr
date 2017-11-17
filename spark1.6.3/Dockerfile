@@ -79,7 +79,7 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
   && cd tmp/ \
   ## Download source code
-  && chmod +x /bootstrap.sh \
+  && chmod +x bootstrap.sh \
   && /bootstrap.sh ${R_VERSION} \
   ## Extract source code
   && tar -xf R-${R_VERSION}.tar.gz \
