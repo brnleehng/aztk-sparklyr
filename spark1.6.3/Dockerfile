@@ -77,8 +77,7 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
   ## Download source code
   && cd tmp/ \
-  && IFS='.' read majorVersion minorVersion patchVersion <<< ${R_VERSION} \
-  && curl -O https://cran.r-project.org/src/base/R-${majorVersion}/R-${R_VERSION}.tar.gz \
+  && /bin/bash -c "IFS='.' read majorVersion minorVersion patchVersion <<< ${R_VERSION}; curl -O https://cran.r-project.org/src/base/R-${majorVersion}/R-${R_VERSION}.tar.gz" \
   ## Extract source code
   && tar -xf R-${R_VERSION}.tar.gz \
   && cd R-${R_VERSION} \
