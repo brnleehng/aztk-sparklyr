@@ -77,8 +77,8 @@ RUN apt-get update \
     xvfb \
     zlib1g-dev" \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
-  && cd tmp/ \
   ## Download source code
+  ##&& cd tmp/ \
   && chmod +x /bootstrap.sh \
   && /bootstrap.sh ${R_VERSION} \
   ## Extract source code
