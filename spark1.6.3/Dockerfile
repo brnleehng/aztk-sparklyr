@@ -80,7 +80,7 @@ RUN apt-get update \
   && cd tmp/ \
   ## Download source code
   && chmod +x /bootstrap.sh \
-  && /bootstrap.sh \
+  && /bootstrap.sh ${R_VERSION} \
   ## Extract source code
   && tar -xf R-${R_VERSION}.tar.gz \
   && cd R-${R_VERSION} \
