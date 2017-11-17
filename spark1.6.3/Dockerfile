@@ -8,6 +8,7 @@ ENV R_VERSION=${R_VERSION:-3.4.2} \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     TERM=xterm
+ENV DEBIAN_FRONTEND noninteractive
 
 ADD bootstrap.sh /bootstrap.sh
 
