@@ -78,9 +78,9 @@ RUN apt-get update \
     zlib1g-dev" \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
   ## Download source code
-  ##&& cd tmp/ \
+  && cd tmp/ \
   && chmod +x /bootstrap.sh \
-  && /bootstrap.sh ${R_VERSION} \
+  && ../bootstrap.sh ${R_VERSION} \
   ## Extract source code
   && tar -xf R-${R_VERSION}.tar.gz \
   && cd R-${R_VERSION} \
