@@ -1,4 +1,4 @@
-FROM jiata/aztk-vanilla:0.1.0-spark1.6.3
+FROM jiata/aztk-base:0.1.0-spark1.6.3
 
 ARG R_VERSION=3.4.1
 ARG RSTUDIO_SERVER_VERSION=1.1.383
@@ -8,7 +8,7 @@ ENV R_VERSION=${R_VERSION:-3.4.2} \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     TERM=xterm
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 ADD bootstrap.sh /bootstrap.sh
 
