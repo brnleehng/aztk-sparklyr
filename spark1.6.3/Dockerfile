@@ -7,7 +7,7 @@ ARG BUILD_DATE
 ENV DEBIAN_FRONTEND noninteractive
 ENV BUILD_DATE ${BUILD_DATE:-}
 
-RUN /bin/bash -c "R_MAJOR_VERSION=${R_VERSION:0:1} && echo $R_MAJOR_VERSION && curl -O https://cran.r-project.org/src/base/R-${R_MAJOR_VERSION}/R-${R_VERSION}.tar.gz"
+ADD ./bootstrap.sh /tmp/bootstrap.sh
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -75,9 +75,7 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
   ## Download source code
   && cd tmp/ \
-  && R_MAJOR_VERSION=${R_VERSION:0:1} \
-  && echo $R_MAJOR_VERSION \
-  && curl -O https://cran.r-project.org/src/base/R-${R_MAJOR_VERSION}/R-${R_VERSION}.tar.gz \
+  && chmod +x /tmp/bootstrap.sh; sleep 1; /tmp/bootstrap.sh $R_VERSION \
   ## Extract source code
   && tar -xf R-${R_VERSION}.tar.gz \
   && cd R-${R_VERSION} \
@@ -120,7 +118,7 @@ RUN apt-get update \
   && export MRAN=$MRAN \
   && echo "options(repos = c(CRAN='$MRAN'), download.file.method = 'libcurl')" >> /usr/local/lib/R/etc/Rprofile.site \
   ## Use littler installation scripts
-  && Rscript -e "install.packages(c('littler', 'docopt'), repo = '$MRAN')" \
+  && Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr'), repo = '$MRAN')" \
   && ln -s /usr/local/lib/R/site-library/littler/examples/install2.r /usr/local/bin/install2.r \
   && ln -s /usr/local/lib/R/site-library/littler/examples/installGithub.r /usr/local/bin/installGithub.r \
   && ln -s /usr/local/lib/R/site-library/littler/bin/r /usr/local/bin/r \
@@ -134,9 +132,7 @@ RUN apt-get update \
   && apt-get autoremove -y \
   && apt-get autoclean -y \
   && rm -rf /var/lib/apt/lists/* \
-
-## Downloading and Installing RStudio Server
-RUN Rscript -e "install.packages(c('tidyverse', 'sparklyr'))" \
+  ## Downloading and Installing RStudio Server
   && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
   && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
   && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \
@@ -145,6 +141,17 @@ RUN Rscript -e "install.packages(c('tidyverse', 'sparklyr'))" \
   && set -e \
   && useradd -m -d /home/rstudio rstudio \
   && echo rstudio:rstudio | chpasswd
+
+## Downloading and Installing RStudio Server
+# RUN Rscript -e "install.packages(c('tidyverse', 'sparklyr'))" \
+#   && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
+#   && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
+#   && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \
+#   ##&& echo "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> ${R_HOME}/etc/Rprofile.site \
+#   ## Preparing default user for Rstudio Server
+#   && set -e \
+#   && useradd -m -d /home/rstudio rstudio \
+#   && echo rstudio:rstudio | chpasswd
 
 CMD ["R"]
 EXPOSE 8787
