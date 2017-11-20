@@ -1,13 +1,13 @@
-FROM jiata/aztk-vanilla:0.1.0-spark2.2.0
+FROM jiata/aztk-base:0.1.0-spark2.2.0
 
 ARG R_VERSION=3.4.1
 ARG RSTUDIO_SERVER_VERSION=1.1.383
 ARG BUILD_DATE
+
+ENV DEBIAN_FRONTEND noninteractive
 ENV BUILD_DATE ${BUILD_DATE:-}
-ENV R_VERSION=${R_VERSION:-3.4.2} \
-    LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    TERM=xterm
+
+ADD ./setup.sh /tmp/setup.sh
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -73,10 +73,9 @@ RUN apt-get update \
     xvfb \
     zlib1g-dev" \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
-  && cd tmp/ \
   ## Download source code
-  && IFS='.' read -r -a baseVersion << ${R_VERSION} \
-  && curl -O https://cran.r-project.org/src/base/R-${baseVersion[0]}/R-${R_VERSION}.tar.gz \
+  && cd tmp/ \
+  && chmod +x /tmp/setup.sh; sleep 1; /tmp/setup.sh $R_VERSION \
   ## Extract source code
   && tar -xf R-${R_VERSION}.tar.gz \
   && cd R-${R_VERSION} \
@@ -119,7 +118,7 @@ RUN apt-get update \
   && export MRAN=$MRAN \
   && echo "options(repos = c(CRAN='$MRAN'), download.file.method = 'libcurl')" >> /usr/local/lib/R/etc/Rprofile.site \
   ## Use littler installation scripts
-  && Rscript -e "install.packages(c('littler', 'docopt'), repo = '$MRAN')" \
+  && Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr'), repo = '$MRAN')" \
   && ln -s /usr/local/lib/R/site-library/littler/examples/install2.r /usr/local/bin/install2.r \
   && ln -s /usr/local/lib/R/site-library/littler/examples/installGithub.r /usr/local/bin/installGithub.r \
   && ln -s /usr/local/lib/R/site-library/littler/bin/r /usr/local/bin/r \
@@ -134,7 +133,6 @@ RUN apt-get update \
   && apt-get autoclean -y \
   && rm -rf /var/lib/apt/lists/* \
   ## Downloading and Installing RStudio Server
-  && Rscript -e "install.packages(c('tidyverse', 'sparklyr'))" \
   && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
   && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
   && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \

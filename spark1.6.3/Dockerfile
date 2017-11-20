@@ -7,7 +7,7 @@ ARG BUILD_DATE
 ENV DEBIAN_FRONTEND noninteractive
 ENV BUILD_DATE ${BUILD_DATE:-}
 
-ADD ./bootstrap.sh /tmp/bootstrap.sh
+ADD ./setup.sh /tmp/setup.sh
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -75,7 +75,7 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
   ## Download source code
   && cd tmp/ \
-  && chmod +x /tmp/bootstrap.sh; sleep 1; /tmp/bootstrap.sh $R_VERSION \
+  && chmod +x /tmp/setup.sh; sleep 1; /tmp/setup.sh $R_VERSION \
   ## Extract source code
   && tar -xf R-${R_VERSION}.tar.gz \
   && cd R-${R_VERSION} \
@@ -141,17 +141,6 @@ RUN apt-get update \
   && set -e \
   && useradd -m -d /home/rstudio rstudio \
   && echo rstudio:rstudio | chpasswd
-
-## Downloading and Installing RStudio Server
-# RUN Rscript -e "install.packages(c('tidyverse', 'sparklyr'))" \
-#   && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
-#   && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
-#   && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \
-#   ##&& echo "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> ${R_HOME}/etc/Rprofile.site \
-#   ## Preparing default user for Rstudio Server
-#   && set -e \
-#   && useradd -m -d /home/rstudio rstudio \
-#   && echo rstudio:rstudio | chpasswd
 
 CMD ["R"]
 EXPOSE 8787
