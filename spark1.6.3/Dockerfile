@@ -1,9 +1,12 @@
+# Ubuntu 16.04 (Xenial)
 FROM jiata/aztk-base:0.1.0-spark1.6.3
 
+# modify these ARGs on build time to specify your desired versions of Spark/Hadoop
 ARG R_VERSION=3.4.1
 ARG RSTUDIO_SERVER_VERSION=1.1.383
 ARG BUILD_DATE
 
+# set env vars
 ENV DEBIAN_FRONTEND noninteractive
 ENV BUILD_DATE ${BUILD_DATE:-}
 
@@ -143,4 +146,5 @@ RUN apt-get update \
   && echo rstudio:rstudio | chpasswd
 
 CMD ["R"]
+CMD ["/bin/bash"]
 EXPOSE 8787
