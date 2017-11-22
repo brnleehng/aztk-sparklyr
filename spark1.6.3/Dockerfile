@@ -109,7 +109,7 @@ RUN apt-get update \
   && MRAN=https://mran.microsoft.com/snapshot/${BUILD_DATE} \
   && echo MRAN=$MRAN >> /etc/environment \
   && export MRAN=$MRAN \
-  && echo "options(repos = c(CRAN='$MRAN'), download.file.method = 'libcurl')" >> /usr/local/lib/R/etc/Rprofile.site \
+  && echo "options(repos = c(CRAN='$MRAN'), download.file.method = 'libcurl'); Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> /usr/local/lib/R/etc/Rprofile.site \
   ## Use littler installation scripts
   && Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr'), repo = '$MRAN')" \
   && ln -s /usr/local/lib/R/site-library/littler/examples/install2.r /usr/local/bin/install2.r \
@@ -129,7 +129,6 @@ RUN apt-get update \
   && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
   && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
   && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \
-  && echo "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> ${R_HOME}/etc/Rprofile.site \
   ## Preparing default user for Rstudio Server
   && set -e \
   && useradd -m -d /home/rstudio rstudio \
