@@ -21,7 +21,6 @@ RUN apt-get update \
     g++ \
     gfortran \
     gsfonts \
-    libbz2-1.0 \
     libcurl3 \
     libopenblas-dev \
     libpangocairo-1.0-0 \
@@ -33,31 +32,23 @@ RUN apt-get update \
     make \
     unzip \
     zip \
-    zlib1g \
     libcurl4-openssl-dev \
     libxml2-dev \
     libapparmor1 \
     gdebi-core \
     lsb-release \
     psmisc \
-    git \
-    libssl-dev \
     sudo \
-    wget \
   && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
   && locale-gen en_US.utf8 \
   && /usr/sbin/update-locale LANG=en_US.UTF-8 \
-  && BUILDDEPS="curl \
-    default-jdk \
-    libbz2-dev \
-    libcairo2-dev \
+  && BUILDDEPS="libcairo2-dev \
     libcurl4-openssl-dev \
     libpango1.0-dev \
     libjpeg-dev \
     libicu-dev \
     libpcre3-dev \
     libpng-dev \
-    libreadline-dev \
     libtiff5-dev \
     liblzma-dev \
     libx11-dev \
@@ -73,8 +64,7 @@ RUN apt-get update \
     x11proto-core-dev \
     xauth \
     xfonts-base \
-    xvfb \
-    zlib1g-dev" \
+    xvfb" \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
   ## Download source code
   && cd tmp/ \
