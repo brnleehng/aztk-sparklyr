@@ -1,9 +1,11 @@
 FROM jiata/aztk-base:0.1.0-spark2.1.0
 
+# modify these ARGs on build time to specify your desired versions of Spark/Hadoop
 ARG R_VERSION=3.4.1
 ARG RSTUDIO_SERVER_VERSION=1.1.383
 ARG BUILD_DATE
 
+# set env vars
 ENV DEBIAN_FRONTEND noninteractive
 ENV BUILD_DATE ${BUILD_DATE:-}
 
@@ -18,7 +20,6 @@ RUN apt-get update \
     g++ \
     gfortran \
     gsfonts \
-    libbz2-1.0 \
     libcurl3 \
     libopenblas-dev \
     libpangocairo-1.0-0 \
@@ -30,31 +31,23 @@ RUN apt-get update \
     make \
     unzip \
     zip \
-    zlib1g \
     libcurl4-openssl-dev \
     libxml2-dev \
     libapparmor1 \
     gdebi-core \
     lsb-release \
     psmisc \
-    git \
-    libssl-dev \
     sudo \
-    wget \
   && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
   && locale-gen en_US.utf8 \
   && /usr/sbin/update-locale LANG=en_US.UTF-8 \
-  && BUILDDEPS="curl \
-    default-jdk \
-    libbz2-dev \
-    libcairo2-dev \
+  && BUILDDEPS="libcairo2-dev \
     libcurl4-openssl-dev \
     libpango1.0-dev \
     libjpeg-dev \
     libicu-dev \
     libpcre3-dev \
     libpng-dev \
-    libreadline-dev \
     libtiff5-dev \
     liblzma-dev \
     libx11-dev \
@@ -70,8 +63,7 @@ RUN apt-get update \
     x11proto-core-dev \
     xauth \
     xfonts-base \
-    xvfb \
-    zlib1g-dev" \
+    xvfb" \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
   ## Download source code
   && cd tmp/ \
@@ -116,7 +108,7 @@ RUN apt-get update \
   && MRAN=https://mran.microsoft.com/snapshot/${BUILD_DATE} \
   && echo MRAN=$MRAN >> /etc/environment \
   && export MRAN=$MRAN \
-  && echo "options(repos = c(CRAN='$MRAN'), download.file.method = 'libcurl')" >> /usr/local/lib/R/etc/Rprofile.site \
+  && echo "options(repos = c(CRAN='$MRAN'), download.file.method = 'libcurl'); Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> /usr/local/lib/R/etc/Rprofile.site \
   ## Use littler installation scripts
   && Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr'), repo = '$MRAN')" \
   && ln -s /usr/local/lib/R/site-library/littler/examples/install2.r /usr/local/bin/install2.r \
@@ -128,7 +120,7 @@ RUN apt-get update \
   ## Clean up from R source install
   && cd / \
   && rm -rf /tmp/* \
-  && apt-get remove --purge -y $BUILDDEPS \
+  ##&& apt-get remove --purge -y $BUILDDEPS \
   && apt-get autoremove -y \
   && apt-get autoclean -y \
   && rm -rf /var/lib/apt/lists/* \
@@ -136,11 +128,11 @@ RUN apt-get update \
   && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
   && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
   && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \
-  && echo "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> ${R_HOME}/etc/Rprofile.site \
   ## Preparing default user for Rstudio Server
   && set -e \
   && useradd -m -d /home/rstudio rstudio \
   && echo rstudio:rstudio | chpasswd
 
 CMD ["R"]
+CMD ["/bin/bash"]
 EXPOSE 8787
