@@ -128,6 +128,7 @@ RUN apt-get update \
   && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
   && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
   && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \
+  && rstudio-server start \
   ## Preparing default user for Rstudio Server
   && set -e \
   && useradd -m -d /home/rstudio rstudio \
