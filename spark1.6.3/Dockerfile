@@ -134,8 +134,11 @@ RUN apt-get update \
   && useradd -m -d /home/rstudio rstudio -g staff \
   && echo rstudio:rstudio | chpasswd \
   ## Starting Rstudio Server
+  && rstudio-server verify-installation \
   && rstudio-server start \
+
+EXPOSE 8787
 
 CMD ["R"]
 CMD ["/bin/bash"]
-EXPOSE 8787
+CMD ["/usr/lib/rstudio-server/bin/rserver", "--server-daemonize=0", "--server-app-armor-enabled=0"]
