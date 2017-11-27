@@ -101,7 +101,6 @@ RUN apt-get update \
   && mkdir -p /usr/local/lib/R/site-library \
   && chown root:staff /usr/local/lib/R/site-library \
   && chmod g+wx /usr/local/lib/R/site-library \
-  && chmod u+wx /usr/local/lib/R/site-library \
   ## Fix library path
   && echo "R_LIBS_USER='/usr/local/lib/R/site-library'" >> /usr/local/lib/R/etc/Renviron \
   && echo "R_LIBS=\${R_LIBS-'/usr/local/lib/R/site-library:/usr/local/lib/R/library:/usr/lib/R/library'}" >> /usr/local/lib/R/etc/Renviron \
@@ -130,11 +129,12 @@ RUN apt-get update \
   && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
   && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
   && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \
-  && rstudio-server start \
   ## Preparing default user for Rstudio Server
   && set -e \
-  && useradd -m -d /home/rstudio rstudio \
-  && echo rstudio:rstudio | chpasswd
+  && useradd -m -d /home/rstudio rstudio -g staff \
+  && echo rstudio:rstudio | chpasswd \
+  ## Starting Rstudio Server
+  && rstudio-server start \
 
 CMD ["R"]
 CMD ["/bin/bash"]
