@@ -133,9 +133,10 @@ RUN apt-get update \
   && set -e \
   && useradd -m -d /home/rstudio rstudio -g staff \
   && echo rstudio:rstudio | chpasswd \
+
   ## Starting Rstudio Server
-  && rstudio-server verify-installation \
-  && rstudio-server start \
+RUN /usr/lib/rstudio-server/bin/rstudio-server verify-installation \
+  && /usr/lib/rstudio-server/bin/rstudio-server start \
 
 EXPOSE 8787
 
