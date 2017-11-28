@@ -137,6 +137,7 @@ RUN apt-get update \
   ## Starting Rstudio Server
 RUN /usr/lib/rstudio-server/bin/rstudio-server verify-installation \
   && /usr/lib/rstudio-server/bin/rstudio-server start \
+  && /usr/lib/rstudio-server/bin/rserver --server-daemonize=0 --server-app-armor-enabled=0
 
 EXPOSE 8787
 
