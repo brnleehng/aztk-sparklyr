@@ -127,20 +127,20 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* \
   ## Downloading and Installing RStudio Server
   && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
-  && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
+  && gdebi rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb --non-interactive \
   && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \
+  && rm rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
   ## Preparing default user for Rstudio Server
   && set -e \
   && useradd -m -d /home/rstudio rstudio -g staff \
   && echo rstudio:rstudio | chpasswd \
-
   ## Starting Rstudio Server
-RUN /usr/lib/rstudio-server/bin/rstudio-server verify-installation \
-  && /usr/lib/rstudio-server/bin/rstudio-server start \
-  && /usr/lib/rstudio-server/bin/rserver --server-daemonize=0 --server-app-armor-enabled=0
+  ##&& /usr/lib/rstudio-server/bin/rstudio-server verify-installation \
+  ## && /usr/lib/rstudio-server/bin/rstudio-server start \
+  && exec /usr/lib/rstudio-server/bin/rserver --server-daemonize 0
 
 EXPOSE 8787
 
 CMD ["R"]
 CMD ["/bin/bash"]
-CMD ["/usr/lib/rstudio-server/bin/rserver", "--server-daemonize=0", "--server-app-armor-enabled=0"]
+##CMD ["/usr/lib/rstudio-server/bin/rserver --server-daemonize 0"]
