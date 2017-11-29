@@ -11,7 +11,7 @@ ENV BUILD_DATE ${BUILD_DATE:-}
 ENV RSTUDIO_SERVER_VERSION $RSTUDIO_SERVER_VERSION
 ENV R_VERSION $R_VERSION
 
-ADD ./setup.sh /tmp/setup.sh
+## ADD ./setup.sh /tmp/setup.sh
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -65,7 +65,8 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
   ## Download source code
   && cd tmp/ \
-  && chmod +x /tmp/setup.sh; sleep 1; /tmp/setup.sh $R_VERSION \
+  && majorVersion=$(echo $R_VERSION | cut -f1 -d.) \
+  && curl -O https://cran.r-project.org/src/base/R-${majorVersion}/R-${R_VERSION}.tar.gz \
   ## Extract source code
   && tar -xf R-${R_VERSION}.tar.gz \
   && cd R-${R_VERSION} \
