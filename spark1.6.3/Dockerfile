@@ -9,6 +9,8 @@ ARG BUILD_DATE
 # set env vars
 ENV DEBIAN_FRONTEND noninteractive
 ENV BUILD_DATE ${BUILD_DATE:-}
+ENV R_VERSION $R_VERSION
+ENV RSTUDIO_SERVER_VERSION $RSTUDIO_SERVER_VERSION
 
 ADD ./setup.sh /tmp/setup.sh
 
@@ -24,10 +26,7 @@ RUN apt-get update \
     libcurl3 \
     libopenblas-dev \
     libpangocairo-1.0-0 \
-    libpcre3 \
     libpng16-16 \
-    libtiff5 \
-    liblzma5 \
     locales \
     make \
     unzip \
@@ -43,7 +42,6 @@ RUN apt-get update \
   && locale-gen en_US.utf8 \
   && /usr/sbin/update-locale LANG=en_US.UTF-8 \
   && BUILDDEPS="libcairo2-dev \
-    libcurl4-openssl-dev \
     libpango1.0-dev \
     libjpeg-dev \
     libicu-dev \
@@ -121,26 +119,8 @@ RUN apt-get update \
   ## Clean up from R source install
   && cd / \
   && rm -rf /tmp/* \
-  ##&& apt-get remove --purge -y $BUILDDEPS \
   && apt-get autoremove -y \
   && apt-get autoclean -y \
-  && rm -rf /var/lib/apt/lists/* \
-  ## Downloading and Installing RStudio Server
-  && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
-  && gdebi rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb --non-interactive \
-  && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \
-  && rm rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
-  ## Preparing default user for Rstudio Server
-  && set -e \
-  && useradd -m -d /home/rstudio rstudio -g staff \
-  && echo rstudio:rstudio | chpasswd \
-  ## Starting Rstudio Server
-  ##&& /usr/lib/rstudio-server/bin/rstudio-server verify-installation \
-  ## && /usr/lib/rstudio-server/bin/rstudio-server start \
-  && exec /usr/lib/rstudio-server/bin/rserver --server-daemonize 0
+  && rm -rf /var/lib/apt/lists/*
 
-EXPOSE 8787
-
-CMD ["R"]
-CMD ["/bin/bash"]
-##CMD ["/usr/lib/rstudio-server/bin/rserver --server-daemonize 0"]
+  CMD ["/bin/bash"]
