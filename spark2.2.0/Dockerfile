@@ -23,10 +23,7 @@ RUN apt-get update \
     libcurl3 \
     libopenblas-dev \
     libpangocairo-1.0-0 \
-    libpcre3 \
     libpng16-16 \
-    libtiff5 \
-    liblzma5 \
     locales \
     make \
     unzip \
@@ -42,7 +39,6 @@ RUN apt-get update \
   && locale-gen en_US.utf8 \
   && /usr/sbin/update-locale LANG=en_US.UTF-8 \
   && BUILDDEPS="libcairo2-dev \
-    libcurl4-openssl-dev \
     libpango1.0-dev \
     libjpeg-dev \
     libicu-dev \
@@ -100,7 +96,6 @@ RUN apt-get update \
   && mkdir -p /usr/local/lib/R/site-library \
   && chown root:staff /usr/local/lib/R/site-library \
   && chmod g+wx /usr/local/lib/R/site-library \
-  && chmod u+wx /usr/local/lib/R/site-library \
   ## Fix library path
   && echo "R_LIBS_USER='/usr/local/lib/R/site-library'" >> /usr/local/lib/R/etc/Renviron \
   && echo "R_LIBS=\${R_LIBS-'/usr/local/lib/R/site-library:/usr/local/lib/R/library:/usr/lib/R/library'}" >> /usr/local/lib/R/etc/Renviron \
@@ -121,20 +116,8 @@ RUN apt-get update \
   ## Clean up from R source install
   && cd / \
   && rm -rf /tmp/* \
-  ##&& apt-get remove --purge -y $BUILDDEPS \
   && apt-get autoremove -y \
   && apt-get autoclean -y \
-  && rm -rf /var/lib/apt/lists/* \
-  ## Downloading and Installing RStudio Server
-  && wget https://download2.rstudio.org/rstudio-server-$RSTUDIO_SERVER_VERSION-amd64.deb \
-  && gdebi rstudio-server-1.1.383-amd64.deb --non-interactive \
-  && echo "server-app-armor-enabled=0" | tee -a /etc/rstudio/rserver.conf \
-  && rstudio-server start \
-  ## Preparing default user for Rstudio Server
-  && set -e \
-  && useradd -m -d /home/rstudio rstudio \
-  && echo rstudio:rstudio | chpasswd
+  && rm -rf /var/lib/apt/lists/*
 
-CMD ["R"]
-CMD ["/bin/bash"]
-EXPOSE 8787
+  CMD ["/bin/bash"]
