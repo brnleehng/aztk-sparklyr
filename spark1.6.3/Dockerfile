@@ -1,5 +1,5 @@
 # Ubuntu 16.04 (Xenial)
-FROM jiata/aztk-base:0.1.0-spark1.6.3
+FROM aztk/gpu:spark1.6.3
 
 # modify these ARGs on build time to specify your desired versions of Spark/Hadoop
 ARG R_VERSION=3.4.1
@@ -63,7 +63,7 @@ RUN apt-get update \
     xvfb" \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
   ## Download source code
-  && cd tmp/ \
+  && cd /tmp/ \
   && majorVersion=$(echo $R_VERSION | cut -f1 -d.) \
   && curl -O https://cran.r-project.org/src/base/R-${majorVersion}/R-${R_VERSION}.tar.gz \
   ## Extract source code
@@ -123,3 +123,4 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
   CMD ["/bin/bash"]
+  
