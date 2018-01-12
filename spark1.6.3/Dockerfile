@@ -38,7 +38,8 @@ RUN apt-get update \
     sudo \
     libpython2.7 \
     python-pip \
-    python-virtualenv \
+  && pip install --upgrade pip \
+  && pip install virtualenv \
   && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
   && locale-gen en_US.utf8 \
   && /usr/sbin/update-locale LANG=en_US.UTF-8 \
@@ -110,8 +111,8 @@ RUN apt-get update \
   && echo MRAN=$MRAN >> /etc/environment \
   && export MRAN=$MRAN \
   && echo "options(repos = c(CRAN='$MRAN'), download.file.method = 'libcurl'); Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> /usr/local/lib/R/etc/Rprofile.site \
-  ## Use littler installation scripts
-  && Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr'), repo = '$MRAN')" \
+  && Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr', 'keras', 'tensorflow'), repo = '$MRAN')" \
+  && Rscript -e "keras::install_keras(tensorflow = 'gpu')" \
   && ln -s /usr/local/lib/R/site-library/littler/examples/install2.r /usr/local/bin/install2.r \
   && ln -s /usr/local/lib/R/site-library/littler/examples/installGithub.r /usr/local/bin/installGithub.r \
   && ln -s /usr/local/lib/R/site-library/littler/bin/r /usr/local/bin/r \
