@@ -38,6 +38,7 @@ RUN apt-get update \
     sudo \
     libpython2.7 \
     python-pip \
+    python-virtualenv \
   && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
   && locale-gen en_US.utf8 \
   && /usr/sbin/update-locale LANG=en_US.UTF-8 \
