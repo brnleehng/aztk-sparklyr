@@ -36,10 +36,12 @@ RUN apt-get update \
     lsb-release \
     psmisc \
     sudo \
-    libpython2.7 \
-    python-pip \
-  && pip install --upgrade pip \
-  && pip install virtualenv \
+    libpython3.5 \
+    python3-pip \
+		python3-dev \
+	&& pip3 install virtualenv \
+  && pip3 install tensorflow \
+  && pip3 install keras \
   && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
   && locale-gen en_US.utf8 \
   && /usr/sbin/update-locale LANG=en_US.UTF-8 \
@@ -112,7 +114,6 @@ RUN apt-get update \
   && export MRAN=$MRAN \
   && echo "options(repos = c(CRAN='$MRAN'), download.file.method = 'libcurl'); Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> /usr/local/lib/R/etc/Rprofile.site \
   && Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr', 'keras', 'tensorflow'), repo = '$MRAN')" \
-  && Rscript -e "keras::install_keras(tensorflow = 'gpu')" \
   && ln -s /usr/local/lib/R/site-library/littler/examples/install2.r /usr/local/bin/install2.r \
   && ln -s /usr/local/lib/R/site-library/littler/examples/installGithub.r /usr/local/bin/installGithub.r \
   && ln -s /usr/local/lib/R/site-library/littler/bin/r /usr/local/bin/r \
@@ -126,5 +127,8 @@ RUN apt-get update \
   && apt-get autoclean -y \
   && rm -rf /var/lib/apt/lists/*
 
-  CMD ["/bin/bash"]
+USER rstudio
+RUN pip install virtualenv
+
+CMD ["/bin/bash"]
   
