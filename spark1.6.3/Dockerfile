@@ -120,6 +120,10 @@ RUN apt-get update \
   ## TEMPORARY WORKAROUND to get more robust error handling for install2.r prior to littler update
   && curl -O /usr/local/bin/install2.r https://github.com/eddelbuettel/littler/raw/master/inst/examples/install2.r \
   && chmod +x /usr/local/bin/install2.r \
+  ## Creating user for rstudio server
+  && useradd -m -d /home/rstudio rstudio -g staff \
+  && echo rstudio:rstudio | chpasswd \ 
+  && usermod -aG sudo rstudio \
   ## Clean up from R source install
   && cd / \
   && rm -rf /tmp/* \
@@ -128,7 +132,8 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 USER rstudio
-RUN pip install virtualenv
+RUN pip install virtualenv 
 
+USER root
 CMD ["/bin/bash"]
   
