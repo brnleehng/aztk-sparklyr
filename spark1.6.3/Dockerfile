@@ -12,7 +12,12 @@ ENV BUILD_DATE ${BUILD_DATE:-}
 ENV RSTUDIO_SERVER_VERSION $RSTUDIO_SERVER_VERSION
 ENV R_VERSION $R_VERSION
 
-RUN apt-get update \
+# Creating rstudio user
+RUN  useradd -m -d /home/rstudio rstudio -g staff \
+  && echo rstudio:rstudio | chpasswd \ 
+  && usermod -aG sudo rstudio \
+  # Installing needed packages
+  && apt-get update \
   && apt-get install -y --no-install-recommends \
     bash-completion \
     ca-certificates \
@@ -38,7 +43,7 @@ RUN apt-get update \
     sudo \
     libpython3.5 \
     python3-pip \
-		python3-dev \
+    python3-dev \
     python-virtualenv \ 
   && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
   && locale-gen en_US.utf8 \
@@ -118,10 +123,6 @@ RUN apt-get update \
   ## TEMPORARY WORKAROUND to get more robust error handling for install2.r prior to littler update
   && curl -O /usr/local/bin/install2.r https://github.com/eddelbuettel/littler/raw/master/inst/examples/install2.r \
   && chmod +x /usr/local/bin/install2.r \
-  ## Creating user for rstudio server
-  && useradd -m -d /home/rstudio rstudio -g staff \
-  && echo rstudio:rstudio | chpasswd \ 
-  && usermod -aG sudo rstudio \
   ## Clean up from R source install
   && cd / \
   && rm -rf /tmp/* \
