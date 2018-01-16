@@ -39,7 +39,7 @@ RUN apt-get update \
     libpython3.5 \
     python3-pip \
 		python3-dev \
-    python-virtualenv \
+    python-virtualenv \ 
   && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
   && locale-gen en_US.utf8 \
   && /usr/sbin/update-locale LANG=en_US.UTF-8 \
@@ -129,16 +129,5 @@ RUN apt-get update \
   && apt-get autoclean -y \
   && rm -rf /var/lib/apt/lists/*
 
-USER rstudio
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
-    libpython3.5 \
-    python3-pip \
-		python3-dev \
-    python-virtualenv \
-  && pip3 install tensorflow \
-  && pip3 install keras \
-
-USER root
 CMD ["/bin/bash"]
   
