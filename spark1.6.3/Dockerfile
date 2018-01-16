@@ -132,7 +132,14 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 USER rstudio
-RUN pip install virtualenv 
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    libpython3.5 \
+    python3-pip \
+		python3-dev \
+    python-virtualenv \
+  && pip3 install tensorflow \
+  && pip3 install keras \
 
 USER root
 CMD ["/bin/bash"]
