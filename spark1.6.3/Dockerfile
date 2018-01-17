@@ -14,7 +14,7 @@ ENV R_VERSION $R_VERSION
 
 RUN  useradd -m -d /home/rstudio rstudio -g staff \
   && echo rstudio:rstudio | chpasswd \ 
-  && usermod -aG sudo,staff rstudio \
+  && usermod -aG sudo,staff rstudio
 
 USER rstudio
 RUN chmod -R 777 $PYENV_ROOT  \
@@ -139,9 +139,6 @@ RUN apt-get update \
   && apt-get autoremove -y \
   && apt-get autoclean -y \
   && rm -rf /var/lib/apt/lists/*
-
-USER rstudio
-
 
 CMD ["/bin/bash"]
   
