@@ -17,9 +17,6 @@ RUN  useradd -m -d /home/rstudio rstudio -g staff \
   && usermod -aG sudo,staff rstudio
 
 USER rstudio
-RUN chmod -R 777 $PYENV_ROOT  \
-  && echo 'export PATH=//.pyenv/shims/:$PATH' >> ~/.bashrc
-
 RUN git clone git://github.com/yyuu/pyenv.git .pyenv \
     && git clone https://github.com/yyuu/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv \
     # install & setup pyenv
