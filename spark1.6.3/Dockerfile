@@ -12,16 +12,26 @@ ENV BUILD_DATE ${BUILD_DATE:-}
 ENV RSTUDIO_SERVER_VERSION $RSTUDIO_SERVER_VERSION
 ENV R_VERSION $R_VERSION
 
-RUN chmod -R 777 $PYENV_ROOT  \
-  && echo 'export PATH=//.pyenv/shims/:$PATH' >> ~/.bashrc
-
-# Creating rstudio user
 RUN  useradd -m -d /home/rstudio rstudio -g staff \
   && echo rstudio:rstudio | chpasswd \ 
   && usermod -aG sudo,staff rstudio \
-  # Installing needed packages
-  && apt-get update \
-  && apt-get install -y --no-install-recommends \
+
+USER rstudio
+RUN chmod -R 777 $PYENV_ROOT  \
+  && echo 'export PATH=//.pyenv/shims/:$PATH' >> ~/.bashrc
+
+RUN git clone git://github.com/yyuu/pyenv.git .pyenv \
+    && git clone https://github.com/yyuu/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv \
+    # install & setup pyenv
+    && eval "$(pyenv init -)" \
+    && echo 'eval "$(pyenv init -)"' >> ~/.bashrc \
+    # install aztk required python version 
+    && pyenv install -f $AZTK_PYTHON_VERSION \
+    && pyenv global $AZTK_PYTHON_VERSION
+
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
     bash-completion \
     ca-certificates \
     file \
@@ -43,11 +53,7 @@ RUN  useradd -m -d /home/rstudio rstudio -g staff \
     gdebi-core \
     lsb-release \
     psmisc \
-    sudo \
-    libpython3.5 \
-    python3-pip \
-    python3-dev \
-    python-virtualenv \ 
+    sudo \ 
     openmpi-bin \
   && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
   && locale-gen en_US.utf8 \
@@ -133,6 +139,9 @@ RUN  useradd -m -d /home/rstudio rstudio -g staff \
   && apt-get autoremove -y \
   && apt-get autoclean -y \
   && rm -rf /var/lib/apt/lists/*
+
+USER rstudio
+
 
 CMD ["/bin/bash"]
   
