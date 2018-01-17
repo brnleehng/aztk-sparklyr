@@ -26,7 +26,7 @@ RUN git clone git://github.com/yyuu/pyenv.git .pyenv \
     && eval "$(pyenv init -)" \
     && echo 'eval "$(pyenv init -)"' >> ~/.bashrc \
     # install aztk required python version 
-    && pyenv install -f $AZTK_PYTHON_VERSION \
+    && pyenv install --enable-shared -f $AZTK_PYTHON_VERSION \
     && pyenv global $AZTK_PYTHON_VERSION
 
 USER root
