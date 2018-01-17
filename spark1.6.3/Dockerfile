@@ -12,7 +12,8 @@ ENV BUILD_DATE ${BUILD_DATE:-}
 ENV RSTUDIO_SERVER_VERSION $RSTUDIO_SERVER_VERSION
 ENV R_VERSION $R_VERSION
 
-RUN echo 'export PATH=//.pyenv/shims/:$PATH' >> ~/.bashrc 
+RUN chmod 777 $PYENV_ROOT  \
+  && echo 'export PATH=//.pyenv/shims/:$PATH' >> ~/.bashrc
 
 # Creating rstudio user
 RUN  useradd -m -d /home/rstudio rstudio -g staff \
