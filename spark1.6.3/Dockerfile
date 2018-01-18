@@ -21,7 +21,8 @@ RUN  useradd -m -d /home/rstudio rstudio -g staff \
   && chown rstudio /.pyenv
 
 USER rstudio
-RUN git clone git://github.com/yyuu/pyenv.git .pyenv \
+RUN cd /home/rstudio \
+    && git clone git://github.com/yyuu/pyenv.git /.pyenv \
     && git clone https://github.com/yyuu/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv \
     # install & setup pyenv
     && eval "$(pyenv init -)" \
