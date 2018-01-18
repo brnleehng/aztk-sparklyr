@@ -16,12 +16,12 @@ ENV R_VERSION $R_VERSION
 
 RUN  useradd -m -d /home/rstudio rstudio -g staff \
   && echo rstudio:rstudio | chpasswd \ 
-  && usermod -aG sudo,staff rstudio
+  && usermod -aG sudo,staff rstudio \
+  && mkdir -p /.pyenv \
+  && chown rstudio /.pyenv
 
 USER rstudio
-RUN mkdir .pyenv \
-    && chmod 777 .pyenv \
-    && git clone git://github.com/yyuu/pyenv.git .pyenv \
+RUN git clone git://github.com/yyuu/pyenv.git .pyenv \
     && git clone https://github.com/yyuu/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv \
     # install & setup pyenv
     && eval "$(pyenv init -)" \
@@ -30,11 +30,8 @@ RUN mkdir .pyenv \
     && env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.5.4 \
     && pyenv global 3.5.4 \
     # install cntk and tensorflow
-    && pip install $CNTK_GPU_VERSION \
-    && pip install $CNTK_CPU_VERSION \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
-      openmpi-bin
+    && pip3 install $CNTK_GPU_VERSION \
+    && pip3 install $CNTK_CPU_VERSION
 
 USER root
 RUN apt-get update \
