@@ -4,6 +4,8 @@ FROM aztk/gpu:spark1.6.3
 # modify these ARGs on build time to specify your desired versions of Spark/Hadoop
 ARG R_VERSION=3.4.1
 ARG RSTUDIO_SERVER_VERSION=1.1.383
+ARG CNTK_GPU_VERSION=https://cntk.ai/PythonWheel/GPU/cntk-2.3.1-cp35-cp35m-linux_x86_64.whl
+ARG CNTK_CPU_VERSION=https://cntk.ai/PythonWheel/CPU-Only/cntk-2.3.1-cp35-cp35m-linux_x86_64.whl
 ARG BUILD_DATE
 
 # set env vars
@@ -12,19 +14,25 @@ ENV BUILD_DATE ${BUILD_DATE:-}
 ENV RSTUDIO_SERVER_VERSION $RSTUDIO_SERVER_VERSION
 ENV R_VERSION $R_VERSION
 
-RUN  useradd -m -d /home/rstudio rstudio -g staff \
+RUN  useradd -m -d /home/rstudio rstudio -g staff,sudo \
   && echo rstudio:rstudio | chpasswd \ 
-  && usermod -aG sudo,staff rstudio
 
 USER rstudio
-RUN git clone git://github.com/yyuu/pyenv.git .pyenv \
+RUN mkdir .pyenv \
+    && git clone git://github.com/yyuu/pyenv.git .pyenv \
     && git clone https://github.com/yyuu/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv \
     # install & setup pyenv
     && eval "$(pyenv init -)" \
     && echo 'eval "$(pyenv init -)"' >> ~/.bashrc \
     # install aztk required python version 
-    && pyenv install --enable-shared -f $AZTK_PYTHON_VERSION \
-    && pyenv global $AZTK_PYTHON_VERSION
+    && env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.5.4 \
+    && pyenv global 3.5.4 \
+    # install cntk and tensorflow
+    && pip install $CNTK_GPU_VERSION \
+    && pip install $CNTK_CPU_VERSION \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+      openmpi-bin
 
 USER root
 RUN apt-get update \
@@ -50,8 +58,7 @@ RUN apt-get update \
     gdebi-core \
     lsb-release \
     psmisc \
-    sudo \ 
-    openmpi-bin \
+    sudo \
   && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
   && locale-gen en_US.utf8 \
   && /usr/sbin/update-locale LANG=en_US.UTF-8 \
