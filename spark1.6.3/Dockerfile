@@ -20,6 +20,7 @@ RUN  useradd -m -d /home/rstudio rstudio -g staff \
 
 USER rstudio
 RUN mkdir .pyenv \
+    && chmod 777 .pyenv \
     && git clone git://github.com/yyuu/pyenv.git .pyenv \
     && git clone https://github.com/yyuu/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv \
     # install & setup pyenv
