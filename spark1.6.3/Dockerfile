@@ -4,6 +4,7 @@ FROM aztk/gpu:spark1.6.3
 # modify these ARGs on build time to specify your desired versions of Spark/Hadoop
 ARG R_VERSION=3.4.1
 ARG RSTUDIO_SERVER_VERSION=1.1.383
+ARG USER_PYTHON_VERSION=3.5.4
 ARG CNTK_GPU_VERSION=https://cntk.ai/PythonWheel/GPU/cntk-2.3.1-cp35-cp35m-linux_x86_64.whl
 ARG CNTK_CPU_VERSION=https://cntk.ai/PythonWheel/CPU-Only/cntk-2.3.1-cp35-cp35m-linux_x86_64.whl
 ARG BUILD_DATE
@@ -14,25 +15,32 @@ ENV BUILD_DATE ${BUILD_DATE:-}
 ENV RSTUDIO_SERVER_VERSION $RSTUDIO_SERVER_VERSION
 ENV R_VERSION $R_VERSION
 
-RUN  useradd -m -d /home/rstudio rstudio -g staff \
-  && echo rstudio:rstudio | chpasswd \ 
-  && usermod -aG sudo,staff rstudio \
-  && mkdir -p /.pyenv \
-  && chown rstudio /.pyenv
+RUN  useradd -m -d /home/rstudio rstudio -G sudo,staff \
+  && echo rstudio:rstudio | chpasswd \
+  && chown -R rstudio /home/rstudio \
+  && chmod -R 777 //.pyenv/
 
+# Setting up rstudio user
 USER rstudio
-RUN cd /home/rstudio \
-    && git clone git://github.com/yyuu/pyenv.git .PYENV \
-    && git clone https://github.com/yyuu/pyenv-virtualenv.git .PYENV/plugins/pyenv-virtualenv \
+
+# Setting up environment variables
+RUN echo 'export HOME=/home/rstudio' >> ~/.bashrc \
+    echo 'export PYENV_ROOT=$HOME/.pyenv' >> ~/.bashrc \
+    echo 'export USER_PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH' >> ~/.bashrc \
+    && source ~/.bashrc \
+    && git clone git://github.com/yyuu/pyenv.git $HOME/.pyenv \
     # install & setup pyenv
     && eval "$(pyenv init -)" \
-    && echo 'eval "$(pyenv init -)"' >> ~/.bashrc \
+    && echo 'eval "$(pyenv init -)"' >> $HOME/.bashrc \
     # install aztk required python version 
-    && env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.5.4 \
-    && pyenv global 3.5.4 \
-    # install cntk and tensorflow
-    && pip3 install $CNTK_GPU_VERSION \
-    && pip3 install $CNTK_CPU_VERSION
+    && env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install -f $USER_PYTHON_VERSION \
+    && pyenv global $USER_PYTHON_VERSION \
+    # install tensorflow & cntk
+    && pip3 install \
+      $CNTK_GPU_VERSION \
+      tensorflow-gpu \
+      keras \
+    && echo "PATH='"$PATH"'" > $HOME/.Renviron
 
 USER root
 RUN apt-get update \
@@ -59,6 +67,7 @@ RUN apt-get update \
     lsb-release \
     psmisc \
     sudo \
+    openmpi-bin \
   && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
   && locale-gen en_US.utf8 \
   && /usr/sbin/update-locale LANG=en_US.UTF-8 \
@@ -129,7 +138,8 @@ RUN apt-get update \
   && MRAN=https://mran.microsoft.com/snapshot/${BUILD_DATE} \
   && echo MRAN=$MRAN >> /etc/environment \
   && export MRAN=$MRAN \
-  && echo "options(repos = c(CRAN='$MRAN'), download.file.method = 'libcurl'); Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> /usr/local/lib/R/etc/Rprofile.site \
+  && echo "options(repos = c(CRAN='$MRAN'), download.file.method = 'libcurl');" >> /usr/local/lib/R/etc/Rprofile.site \
+  && echo "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"');" >> /usr/local/lib/R/etc/Rprofile.site \
   && Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr', 'keras', 'tensorflow'), repo = '$MRAN')" \
   && ln -s /usr/local/lib/R/site-library/littler/examples/install2.r /usr/local/bin/install2.r \
   && ln -s /usr/local/lib/R/site-library/littler/examples/installGithub.r /usr/local/bin/installGithub.r \
