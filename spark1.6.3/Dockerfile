@@ -14,8 +14,9 @@ ENV BUILD_DATE ${BUILD_DATE:-}
 ENV RSTUDIO_SERVER_VERSION $RSTUDIO_SERVER_VERSION
 ENV R_VERSION $R_VERSION
 
-RUN  useradd -m -d /home/rstudio rstudio -g staff,sudo \
+RUN  useradd -m -d /home/rstudio rstudio -g staff \
   && echo rstudio:rstudio | chpasswd \ 
+  && usermod -aG sudo,staff rstudio
 
 USER rstudio
 RUN mkdir .pyenv \
