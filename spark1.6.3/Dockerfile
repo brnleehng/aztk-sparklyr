@@ -26,7 +26,7 @@ USER rstudio
 RUN echo 'export HOME=/home/rstudio' >> /home/rstudio/.bashrc \
   && echo 'export PYENV_ROOT=$HOME/.pyenv' >> /home/rstudio/.bashrc \
   && echo 'export USER_PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH' >> /home/rstudio/.bashrc \
-  && source /home/rstudio/.bashrc \
+  && /bin/bash -c "source /home/rstudio/.bashrc" \
   ## Install & setup pyenv
   && git clone git://github.com/yyuu/pyenv.git $HOME/.pyenv \
   && eval "$(pyenv init -)" \
