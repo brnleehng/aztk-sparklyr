@@ -1,5 +1,5 @@
 # Ubuntu 16.04 (Xenial)
-FROM aztk/gpu:spark1.6.3
+FROM brianlovedocker/aztk-sparklyr:base1.6.3
 
 # modify these ARGs on build time to specify your desired versions of Spark/Hadoop
 ARG R_VERSION=3.4.1
@@ -27,26 +27,31 @@ USER rstudio
 # ENV PYENV_ROOT=/home/rstudio/.pyenv
 
 # Setting up environment variables
-RUN USER_HOME=/home/rstudio \
-  && USER_PYENV_ROOT=$USER_HOME/.pyenv \
-  && USER_PATH=$USER_PYENV_ROOT/shims:$USER_PYENV_ROOT/bin:$PATH \
-  && echo "export HOME="$USER_HOME"" >> /home/rstudio/.profile \
-  && echo "export PYENV_ROOT="$USER_PYENV_ROOT"" >> /home/rstudio/.profile \
-  && echo "export PATH="$USER_PATH"" >> /home/rstudio/.profile \
-  && git clone git://github.com/yyuu/pyenv.git $USER_PYENV_ROOT \
-  && eval "$(pyenv init -)" \
-  && echo 'export PYENV_ROOT="$HOME/.pyenv"' >> $USER_HOME/.bashrc \
-  && echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> $USER_HOME/.bashrc \
-  && echo 'eval "$(pyenv init -)"' >> $USER_HOME/.bashrc \
-  # install aztk required python version 
-  && env PYTHON_CONFIGURE_OPTS="--enable-shared" $USER_PYENV_ROOT/bin/pyenv install -f $USER_PYTHON_VERSION \
-  && $USER_PYENV_ROOT/bin/pyenv global $USER_PYTHON_VERSION \
-  # install tensorflow & cntk
-  && $USER_PYENV_ROOT/shims/pip3 install \
+# RUN echo 'export HOME=/home/rstudio' >> /home/rstudio/.bashrc \
+#   && echo 'export PYENV_ROOT=$HOME/.pyenv' >> /home/rstudio/.bashrc \
+#   && echo 'export PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH' >> /home/rstudio/.bashrc \
+#   && echo 'export PYENV_ROOT="$HOME/.pyenv"' >> /home/rstudio/.bashrc \
+#   && echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> /home/rstudio/.bashrc
+
+# RUN source /home/rstudio/.bashrc
+
+# ## Install & setup pyenv
+# RUN source/home/rstudio/.bashrc \
+#   && git clone git://github.com/yyuu/pyenv.git /home/rstudio/.pyenv \
+#   && eval "$(pyenv init -)" \
+#   && echo 'eval "$(pyenv init -)"' >> /home/rstudio/.bashrc \
+#   # install aztk required python version 
+#   && echo $HOME \
+#   && echo $PYENV_ROOT \
+#   && echo $PATH \
+#   && env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install -f $USER_PYTHON_VERSION \
+#   && pyenv global $USER_PYTHON_VERSION \
+#   # install tensorflow & cntk
+RUN pip3 install \
     $CNTK_GPU_VERSION \
     tensorflow-gpu \
     keras \
-  && echo "PATH='"$PATH"'" > $USER_HOME/.Renviron
+  && echo "PATH='"$PATH"'" > /home/rstudio/.Renviron
 
 USER root
 RUN apt-get update \
