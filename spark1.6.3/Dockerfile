@@ -35,12 +35,14 @@ RUN USER_HOME=/home/rstudio \
   && echo "export PATH="$USER_PATH"" >> /home/rstudio/.profile \
   && git clone git://github.com/yyuu/pyenv.git $USER_PYENV_ROOT \
   && eval "$(pyenv init -)" \
+  && echo 'export PYENV_ROOT="$HOME/.pyenv"' >> $USER_HOME/.bashrc \
+  && echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> $USER_HOME/.bashrc \
   && echo 'eval "$(pyenv init -)"' >> $USER_HOME/.bashrc \
   # install aztk required python version 
   && env PYTHON_CONFIGURE_OPTS="--enable-shared" $USER_PYENV_ROOT/bin/pyenv install -f $USER_PYTHON_VERSION \
   && $USER_PYENV_ROOT/bin/pyenv global $USER_PYTHON_VERSION \
   # install tensorflow & cntk
-  && $USER_PYENV_ROOT/bin/shims/pip3 install \
+  && $USER_PYENV_ROOT/shims/pip3 install \
     $CNTK_GPU_VERSION \
     tensorflow-gpu \
     keras \
