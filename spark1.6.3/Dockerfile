@@ -23,12 +23,12 @@ RUN  useradd -m -d /home/rstudio rstudio -G sudo,staff \
 USER rstudio
 
 # Setting up environment variables
-RUN echo 'export HOME=/home/rstudio' >> ~/.bashrc \
-  && echo 'export PYENV_ROOT=$HOME/.pyenv' >> ~/.bashrc \
-  && echo 'export USER_PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH' >> ~/.bashrc \
-  && source ~/.bashrc \
+RUN echo 'export HOME=/home/rstudio' >> /home/rstudio/.bashrc \
+  && echo 'export PYENV_ROOT=$HOME/.pyenv' >> /home/rstudio/.bashrc \
+  && echo 'export USER_PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH' >> /home/rstudio/.bashrc \
+  && source /home/rstudio/.bashrc \
+  ## Install & setup pyenv
   && git clone git://github.com/yyuu/pyenv.git $HOME/.pyenv \
-  # install & setup pyenv
   && eval "$(pyenv init -)" \
   && echo 'eval "$(pyenv init -)"' >> $HOME/.bashrc \
   # install aztk required python version 
