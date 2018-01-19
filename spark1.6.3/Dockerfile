@@ -16,27 +16,31 @@ ENV R_VERSION $R_VERSION
 
 RUN  useradd -m -d /home/rstudio rstudio -G sudo,staff \
   && echo rstudio:rstudio | chpasswd \
-  && chown -R rstudio /home/rstudio \
+  && chmod -R 777 /home/rstudio \
   && chmod -R 777 //.pyenv/
 
 # Setting up rstudio user
 USER rstudio
+# ENV HOME=/home/rstudio
+# ENV USER_PYTHON_VERSION $USER_PYTHON_VERSION
+# ENV PATH $HOME/.pyenv/shims:$HOME/.pyenv/bin:$PATH
+# ENV PYENV_ROOT=/home/rstudio/.pyenv
 
 # Setting up environment variables
-RUN USER_HOME=home/rstudio \
-  && USER_PYENV_ROOT=$USER_HOME \
+RUN USER_HOME=/home/rstudio \
+  && USER_PYENV_ROOT=$USER_HOME/.pyenv \
   && USER_PATH=$USER_PYENV_ROOT/shims:$USER_PYENV_ROOT/bin:$PATH \
   && echo "export HOME="$USER_HOME"" >> /home/rstudio/.profile \
   && echo "export PYENV_ROOT="$USER_PYENV_ROOT"" >> /home/rstudio/.profile \
   && echo "export PATH="$USER_PATH"" >> /home/rstudio/.profile \
-  && git clone git://github.com/yyuu/pyenv.git $USER_HOME/.pyenv \
+  && git clone git://github.com/yyuu/pyenv.git $USER_PYENV_ROOT \
   && eval "$(pyenv init -)" \
   && echo 'eval "$(pyenv init -)"' >> $USER_HOME/.bashrc \
   # install aztk required python version 
-  && env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install -f $USER_PYTHON_VERSION \
-  && pyenv global $USER_PYTHON_VERSION \
+  && env PYTHON_CONFIGURE_OPTS="--enable-shared" $USER_PYENV_ROOT/bin/pyenv install -f $USER_PYTHON_VERSION \
+  && $USER_PYENV_ROOT/bin/pyenv global $USER_PYTHON_VERSION \
   # install tensorflow & cntk
-  && pip3 install \
+  && $USER_PYENV_ROOT/bin/shims/pip3 install \
     $CNTK_GPU_VERSION \
     tensorflow-gpu \
     keras \
