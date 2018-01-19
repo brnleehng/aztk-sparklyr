@@ -6,7 +6,6 @@ ARG R_VERSION=3.4.1
 ARG RSTUDIO_SERVER_VERSION=1.1.383
 ARG USER_PYTHON_VERSION=3.5.4
 ARG CNTK_GPU_VERSION=https://cntk.ai/PythonWheel/GPU/cntk-2.3.1-cp35-cp35m-linux_x86_64.whl
-ARG CNTK_CPU_VERSION=https://cntk.ai/PythonWheel/CPU-Only/cntk-2.3.1-cp35-cp35m-linux_x86_64.whl
 ARG BUILD_DATE
 
 # set env vars
@@ -25,26 +24,26 @@ USER rstudio
 
 # Setting up environment variables
 RUN echo 'export HOME=/home/rstudio' >> ~/.bashrc \
-    echo 'export PYENV_ROOT=$HOME/.pyenv' >> ~/.bashrc \
-    echo 'export USER_PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH' >> ~/.bashrc \
-    && source ~/.bashrc \
-    && git clone git://github.com/yyuu/pyenv.git $HOME/.pyenv \
-    # install & setup pyenv
-    && eval "$(pyenv init -)" \
-    && echo 'eval "$(pyenv init -)"' >> $HOME/.bashrc \
-    # install aztk required python version 
-    && env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install -f $USER_PYTHON_VERSION \
-    && pyenv global $USER_PYTHON_VERSION \
-    # install tensorflow & cntk
-    && pip3 install \
-      $CNTK_GPU_VERSION \
-      tensorflow-gpu \
-      keras \
-    && echo "PATH='"$PATH"'" > $HOME/.Renviron
+  && echo 'export PYENV_ROOT=$HOME/.pyenv' >> ~/.bashrc \
+  && echo 'export USER_PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH' >> ~/.bashrc \
+  && source ~/.bashrc \
+  && git clone git://github.com/yyuu/pyenv.git $HOME/.pyenv \
+  # install & setup pyenv
+  && eval "$(pyenv init -)" \
+  && echo 'eval "$(pyenv init -)"' >> $HOME/.bashrc \
+  # install aztk required python version 
+  && env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install -f $USER_PYTHON_VERSION \
+  && pyenv global $USER_PYTHON_VERSION \
+  # install tensorflow & cntk
+  && pip3 install \
+    $CNTK_GPU_VERSION \
+    tensorflow-gpu \
+    keras \
+  && echo "PATH='"$PATH"'" > $HOME/.Renviron
 
 USER root
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+  && apt-get install -y --no-install-recommends \
     bash-completion \
     ca-certificates \
     file \
