@@ -23,10 +23,13 @@ RUN  useradd -m -d /home/rstudio rstudio -G sudo,staff \
 USER rstudio
 
 # Setting up environment variables
-RUN echo 'export HOME=/home/rstudio' >> /home/rstudio/.bashrc \
-  && echo 'export PYENV_ROOT=$HOME/.pyenv' >> /home/rstudio/.bashrc \
-  && echo 'export USER_PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH' >> /home/rstudio/.bashrc \
-  && /bin/bash -c "source /home/rstudio/.bashrc" \
+# RUN echo 'export HOME=/home/rstudio' >> /home/rstudio/.bashrc \
+#   && echo 'export PYENV_ROOT=$HOME/.pyenv' >> /home/rstudio/.bashrc \
+#   && echo 'export USER_PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH' >> /home/rstudio/.bashrc \
+#   && /bin/bash -c "source /home/rstudio/.bashrc" \
+RUN su -l rstudio -c 'export HOME=/home/rstudio' \
+  && su -l rstudio -c 'export PYENV_ROOT=$HOME/.pyenv' \
+  && su -l rstudio -c 'export PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH' \
   ## Install & setup pyenv
   && git clone git://github.com/yyuu/pyenv.git $HOME/.pyenv \
   && eval "$(pyenv init -)" \
