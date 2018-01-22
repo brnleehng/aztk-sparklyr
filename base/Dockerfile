@@ -5,7 +5,7 @@ FROM ubuntu:16.04
 ENV AZTK_PYTHON_VERSION=3.5.4
 
 # modify these ARGs on build time to specify your desired versions of Spark/Hadoop
-ARG SPARK_VERSION_KEY=spark-1.6.3-bin-hadoop2.6
+ARG SPARK_VERSION_KEY=spark-2.1.0-bin-hadoop2.7
 
 # set up env vars for pyenv
 ENV HOME /
