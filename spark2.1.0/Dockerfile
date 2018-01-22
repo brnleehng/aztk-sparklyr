@@ -1,8 +1,11 @@
-FROM jiata/aztk-base:0.1.0-spark2.1.0
+# Ubuntu 16.04 (Xenial)
+FROM aztk/gpu:spark2.1.0
 
 # modify these ARGs on build time to specify your desired versions of Spark/Hadoop
 ARG R_VERSION=3.4.1
 ARG RSTUDIO_SERVER_VERSION=1.1.383
+ARG USER_PYTHON_VERSION=3.5.4
+ARG CNTK_GPU_VERSION=https://cntk.ai/PythonWheel/GPU/cntk-2.3.1-cp35-cp35m-linux_x86_64.whl
 ARG BUILD_DATE
 
 # set env vars
@@ -11,8 +14,51 @@ ENV BUILD_DATE ${BUILD_DATE:-}
 ENV RSTUDIO_SERVER_VERSION $RSTUDIO_SERVER_VERSION
 ENV R_VERSION $R_VERSION
 
-## ADD ./setup.sh /tmp/setup.sh
+RUN  useradd -m -d /home/rstudio rstudio -G sudo,staff \
+  && echo rstudio:rstudio | chpasswd \
+  && chmod -R 777 /home/rstudio \
+  && chmod -R 777 //.pyenv/
 
+# Setting up rstudio user
+USER rstudio
+# ## Install & setup pyenv
+RUN git clone git://github.com/yyuu/pyenv.git /home/rstudio/.pyenv \
+  && eval "$(pyenv init -)" \
+  && echo 'eval "$(pyenv init -)"' >> /home/rstudio/.bashrc \
+  #   # install aztk required python version 
+  && echo "Temp paths" \
+  && TEMP_HOME=$HOME \
+  && TEMP_PYENV_ROOT=$PYENV_ROOT \
+  && TEMP_PATH=$PATH\
+  && echo $HOME \
+  && echo $PYENV_ROOT \
+  && echo $PATH \
+  && export HOME=/home/rstudio \
+  && export PATH=$HOME/.pyenv/shims:$HOME/.pyenv/bin:$PATH \
+  && export PYENV_ROOT=/home/rstudio/.pyenv \
+  && echo "Paths have been changed" \
+  && echo $PYENV_ROOT \
+  && echo $PATH \
+  && env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install -f $USER_PYTHON_VERSION \
+  && pyenv global $USER_PYTHON_VERSION \
+  #   # install tensorflow & cntk
+  && echo "PATH='"$PATH"'" > /home/rstudio/.Renviron \
+  && pip3 install \
+      $CNTK_GPU_VERSION \
+      tensorflow-gpu \
+      keras \
+  && echo 'export HOME=/home/rstudio' >> /home/rstudio/.bashrc \
+  && echo 'export PYENV_ROOT=$HOME/.pyenv' >> /home/rstudio/.bashrc \
+  && echo 'export PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH' >> /home/rstudio/.bashrc \
+  && export HOME=$TEMP_HOME \
+  && export PATH=$TEMP_PATH \
+  && export PYENV_ROOT=$TEMP_PYENV_ROOT \
+  && echo "Reverted paths" \
+  && echo $HOME \
+  && echo $PATH \
+  && echo $PYENV_ROOT
+
+USER root
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     bash-completion \
@@ -37,6 +83,7 @@ RUN apt-get update \
     lsb-release \
     psmisc \
     sudo \
+    openmpi-bin \
   && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
   && locale-gen en_US.utf8 \
   && /usr/sbin/update-locale LANG=en_US.UTF-8 \
@@ -64,7 +111,7 @@ RUN apt-get update \
     xvfb" \
   && apt-get install -y --no-install-recommends $BUILDDEPS \
   ## Download source code
-  && cd tmp/ \
+  && cd /tmp/ \
   && majorVersion=$(echo $R_VERSION | cut -f1 -d.) \
   && curl -O https://cran.r-project.org/src/base/R-${majorVersion}/R-${R_VERSION}.tar.gz \
   ## Extract source code
@@ -107,9 +154,9 @@ RUN apt-get update \
   && MRAN=https://mran.microsoft.com/snapshot/${BUILD_DATE} \
   && echo MRAN=$MRAN >> /etc/environment \
   && export MRAN=$MRAN \
-  && echo "options(repos = c(CRAN='$MRAN'), download.file.method = 'libcurl'); Sys.setenv(SPARK_HOME ='"$SPARK_HOME"')" >> /usr/local/lib/R/etc/Rprofile.site \
-  ## Use littler installation scripts
-  && Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr'), repo = '$MRAN')" \
+  && echo "options(repos = c(CRAN='$MRAN'), download.file.method = 'libcurl');" >> /usr/local/lib/R/etc/Rprofile.site \
+  && echo "Sys.setenv(SPARK_HOME ='"$SPARK_HOME"');" >> /usr/local/lib/R/etc/Rprofile.site \
+  && Rscript -e "install.packages(c('littler', 'docopt', 'tidyverse', 'sparklyr', 'keras', 'tensorflow'), repo = '$MRAN')" \
   && ln -s /usr/local/lib/R/site-library/littler/examples/install2.r /usr/local/bin/install2.r \
   && ln -s /usr/local/lib/R/site-library/littler/examples/installGithub.r /usr/local/bin/installGithub.r \
   && ln -s /usr/local/lib/R/site-library/littler/bin/r /usr/local/bin/r \
@@ -123,4 +170,4 @@ RUN apt-get update \
   && apt-get autoclean -y \
   && rm -rf /var/lib/apt/lists/*
 
-  CMD ["/bin/bash"]
+CMD ["/bin/bash"]
