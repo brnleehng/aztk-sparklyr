@@ -1,5 +1,5 @@
 # Ubuntu 16.04 (Xenial)
-FROM brianlovedocker/aztk-sparklyr:base1.6.3
+FROM brianlovedocker/aztk-sparklyr:gpu1.6.3
 
 # modify these ARGs on build time to specify your desired versions of Spark/Hadoop
 ARG R_VERSION=3.4.1
@@ -19,9 +19,8 @@ RUN  useradd -m -d /home/rstudio rstudio -G sudo,staff \
   && chmod -R 777 /home/rstudio \
   && chmod -R 777 //.pyenv/
 
-# Setting up rstudio user
+# Setting up rstudio user with Tensorflow and CNTK
 USER rstudio
-# ## Install & setup pyenv
 RUN  echo "PATH='"$PATH"'" > /home/rstudio/.Renviron \
   && pip3 install \
       $CNTK_GPU_VERSION \
